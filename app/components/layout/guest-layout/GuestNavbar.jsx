@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Sparkles, User, Menu, X, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { Sparkles, User, Menu, X, PlusCircle } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import api from "../../../components/apiconfig/apiconfig";
 import SignInModal from "../../../modules/auth/candidate-recruiter/SignInModal";
@@ -118,7 +118,7 @@ export default function GuestNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-primary-200/50 bg-white/90 backdrop-blur-xl text-text-dark shadow-energy">
+      <header className="sticky top-0 z-[999] border-b border-[#F6E0E0]/50 bg-white/90 backdrop-blur-xl text-gray-900 shadow-[0_8px_25px_rgba(187,25,25,0.25)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
@@ -126,9 +126,9 @@ export default function GuestNavbar() {
               href="/"
               className="flex items-center gap-2.5 sm:gap-3 hover:opacity-90 transition-opacity flex-shrink-0"
             >
-              <b className="text-xl sm:text-2xl font-black tracking-widest bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 bg-clip-text text-transparent drop-shadow-sm hover:from-primary-700 hover:via-primary-800 hover:to-primary-900 transition-all duration-300">
+              <b className="text-xl sm:text-2xl font-bold tracking-wide bg-gradient-to-r from-[#AD1717] via-[#971414] to-[#971414] bg-clip-text text-transparent drop-shadow-sm hover:from-[#971414] hover:via-[#811111] hover:to-[#6B0E0E] transition-all duration-300">
                 Job<span className="relative">
-                  <span className="text-red-800 font-serif text-xl sm:text-2xl">i</span>
+                  <span className="text-red-800 font-bold text-xl sm:text-2xl">i</span>
                 </span>on
               </b>
             </Link>
@@ -159,24 +159,24 @@ export default function GuestNavbar() {
                   <Link
                     href="/"
                     className={`px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive("/") || isActive("/home")
-                      ? "bg-gradient-red text-white shadow-energy"
-                      : "text-text-muted hover:bg-gradient-red hover:text-white hover:shadow-kinetic"
+                      ? "bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-white shadow-energy"
+                      : "text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic"
                       }`}
                   >
                     Home
                   </Link>
                   <Link
-                    href="/jobs"
+                    href="./modules/guest/jobs"
                     className={`px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive("/jobs") || pathname.startsWith("/jobs/")
-                      ? "bg-gradient-red text-white shadow-energy"
-                      : "text-text-muted hover:bg-gradient-red hover:text-white hover:shadow-kinetic"
+                      ? "bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-white shadow-energy"
+                      : "text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic"
                       }`}
                   >
                     Browse Jobs
                   </Link>
                   <Link
                     href="/sign-in?role=recruiter&redirect=post-job"
-                    className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-red hover:text-white hover:shadow-kinetic transition-colors"
+                    className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Post a Job
                   </Link>
@@ -266,7 +266,7 @@ export default function GuestNavbar() {
                   {/* Candidate Login - Navigate to sign-in page */}
                   <Link
                     href="/sign-in?role=candidate"
-                    className="hidden sm:inline-flex px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-red hover:text-white hover:shadow-kinetic transition-colors"
+                    className="hidden sm:inline-flex px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Candidate Login
                   </Link>
@@ -274,7 +274,7 @@ export default function GuestNavbar() {
                   {/* Recruiter Login - Navigate to sign-in page */}
                   <Link
                     href="/sign-in?role=recruiter"
-                    className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-red hover:text-white hover:shadow-kinetic transition-colors"
+                    className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     <span className="hidden sm:inline">Recruiter Login</span>
                     <span className="sm:hidden">Login</span>

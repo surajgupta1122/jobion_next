@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, FormEvent, JSX } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
@@ -26,13 +27,13 @@ export default function Hero(): JSX.Element {
   };
 
   return (
-    <section className="min-h-[85vh] flex items-center justify-center bg-gray-[#FFFFFF] px-4">
+    <section className="min-h-[85vh] m-12 flex items-center justify-center bg-gray-[#FFFFFF] px-4">
       <div className="max-w-5xl w-full text-center ">
 
         {/* Heading */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight mb-8">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight mb-5">
           Trusted Opportunities for{" "}
-          <span className="text-[#BB1919]">Fresh Talent</span>
+          <span className="text-[#BB1919] ">Fresh Talent</span>
         </h1>
 
         {/* Search Box */}
