@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import GuestLayout from "./components/layout/guest-layout/GuestLayout.jsx";
 import { ToastProvider } from "./components/toast";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -27,8 +28,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ToastProvider>
           <GuestLayout>{children}</GuestLayout>

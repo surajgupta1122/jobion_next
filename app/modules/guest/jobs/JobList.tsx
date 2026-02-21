@@ -655,7 +655,7 @@ export default function Jobs() {
           </div>
           <div className="w-full sm:w-auto sm:min-w-[320px] md:min-w-[420px]">
             {/* Mobile-optimized search */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 bg-white rounded-xl border border-gray-200 px-3 sm:px-4 py-2.5 sm:py-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 bg-white rounded-2xl border border-gray-200 px-3 sm:px-4 py-2.5 sm:py-3">
               <div className="flex items-center gap-2 flex-1">
                 <Search size={18} className="text-gray-400 flex-shrink-0" />
                 <input
@@ -668,7 +668,7 @@ export default function Jobs() {
               </div>
               <button
                 onClick={applyFilters}
-                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex-shrink-0"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-semibold text-white bg-[#AD1717] rounded-2xl hover:bg-[#971414] transition-colors flex-shrink-0"
               >
                 Search
               </button>
@@ -677,8 +677,8 @@ export default function Jobs() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px,1fr] gap-4 sm:gap-6 lg:gap-8">
-        <aside className="hidden lg:block bg-white rounded-xl border border-gray-200 overflow-hidden lg:sticky lg:top-4 lg:self-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[23%_1fr] gap-4 sm:gap-6 lg:gap-8">
+        <aside className="hidden lg:block bg-white rounded-3xl border border-gray-200 overflow-hidden lg:sticky lg:top-4 lg:self-start">
           <div className="p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-gray-900">Filters</h2>

@@ -166,8 +166,8 @@ export default function GuestNavbar() {
                     Home
                   </Link>
                   <Link
-                    href="./modules/guest/jobs"
-                    className={`px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive("/jobs") || pathname.startsWith("/jobs/")
+                    href="/modules/guest/jobs"
+                    className={`px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive("/modules/guest/jobs") || pathname.startsWith("/modules/guest/jobs/")
                       ? "bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-white shadow-energy"
                       : "text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic"
                       }`}
@@ -175,7 +175,7 @@ export default function GuestNavbar() {
                     Browse Jobs
                   </Link>
                   <Link
-                    href="/sign-in?role=recruiter&redirect=post-job"
+                    href="/modules/auth/candidate-recruiter"
                     className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Post a Job
@@ -265,7 +265,7 @@ export default function GuestNavbar() {
                 <>
                   {/* Candidate Login - Navigate to sign-in page */}
                   <Link
-                    href="/sign-in?role=candidate"
+                    href="/modules/auth/candidate-recruiter?role=candidate"
                     className="hidden sm:inline-flex px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Candidate Login
@@ -273,7 +273,7 @@ export default function GuestNavbar() {
 
                   {/* Recruiter Login - Navigate to sign-in page */}
                   <Link
-                    href="/sign-in?role=recruiter"
+                    href="/modules/auth/candidate-recruiter?role=recruiter"
                     className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     <span className="hidden sm:inline">Recruiter Login</span>

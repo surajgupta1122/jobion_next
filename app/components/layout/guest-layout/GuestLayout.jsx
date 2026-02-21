@@ -26,6 +26,11 @@ const GuestLayout = ({ children }) => {
     "/sign-in-modal",
     "/admin/signin",
     "/admin/signup",
+    "/create-job",
+    "/modules/auth/candidate-recruiter",
+    "/recruiter-dashboard",
+    "/job-posted",
+    "/recruiter-profile",
   ];
 
   const isAuthRoute =
@@ -59,10 +64,7 @@ const GuestLayout = ({ children }) => {
 
   // Show CandidateHeader if user is logged in as candidate and not on auth pages
   const showCandidateHeader =
-    !loading &&
-    user &&
-    user.role === "candidate" &&
-    !isAuthRoute;
+    !loading && user && user.role === "candidate" && !isAuthRoute;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -71,9 +73,7 @@ const GuestLayout = ({ children }) => {
       </header>
 
       <main className="flex-1">
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
 
       {!hideFooter && (
@@ -87,4 +87,3 @@ const GuestLayout = ({ children }) => {
 };
 
 export default GuestLayout;
-
