@@ -166,7 +166,7 @@ export default function GuestNavbar() {
                     Home
                   </Link>
                   <Link
-                    href="/modules/guest/jobs"
+                    href="/jobs"
                     className={`px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive("/modules/guest/jobs") || pathname.startsWith("/modules/guest/jobs/")
                       ? "bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-white shadow-energy"
                       : "text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic"

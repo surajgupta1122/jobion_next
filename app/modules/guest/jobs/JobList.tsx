@@ -151,6 +151,7 @@ export default function Jobs() {
     };
   }, [router]);
 
+  // Only set searchTerm from URL params on mount
   useEffect(() => {
     // Skip if we're in the process of clearing filters
     if (isClearingFilters.current) {
@@ -160,19 +161,11 @@ export default function Jobs() {
 
     const searchQuery = searchParams.get("search") || "";
     const qParam = searchParams.get("q") || "";
-    const locationParam = searchParams.get("location") || "";
-    const experienceParam = searchParams.get("experience") || "";
 
-    // Set search term from URL params
-    if (searchQuery) {
-      setSearchTerm(searchQuery);
-    } else if (qParam) {
-      setSearchTerm(qParam);
-    } else if (!searchQuery && !qParam) {
-      // Clear search term if no search params in URL
-      setSearchTerm("");
-    }
-  }, [searchParams]);
+    // Set search term from URL params only on mount
+    setSearchTerm(searchQuery || qParam || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch filter options from backend
   useEffect(() => {
@@ -452,7 +445,6 @@ export default function Jobs() {
     if (selectedCities.length) {
       data = data.filter((job) =>
         selectedCities.some((city) => {
-          // Match against city field or location string
           const jobCity = (job.city || "").toLowerCase();
           const jobLocation = (job.location || "").toLowerCase();
           return (
@@ -469,8 +461,6 @@ export default function Jobs() {
           const roleLc = role.toLowerCase();
           const jobRoleName = (job.roleName || "").toLowerCase();
           const jobTitle = (job.title || "").toLowerCase();
-          // Prefer matching against normalized roleName from job_roles,
-          // but fall back to title for legacy data
           return (
             (jobRoleName && jobRoleName.includes(roleLc)) ||
             (!jobRoleName && jobTitle.includes(roleLc))
@@ -481,7 +471,6 @@ export default function Jobs() {
 
     if (selectedJobTypes.length) {
       data = data.filter((job) => {
-        // Normalize job type for comparison
         const normalizedJobType = job.jobType
           .toLowerCase()
           .replace(/\s+/g, "-");
@@ -497,7 +486,6 @@ export default function Jobs() {
 
     if (selectedWorkModes.length) {
       data = data.filter((job) => {
-        // Normalize work mode for comparison
         const normalizedWorkMode = job.workModeValue.toLowerCase();
         return selectedWorkModes.some((mode) => {
           const normalizedMode = mode.toLowerCase();
@@ -513,7 +501,7 @@ export default function Jobs() {
 
         switch (selectedExperience) {
           case "0":
-            return minExp === 0; // Only check min experience, ignore max experience
+            return minExp === 0;
           case "0-2":
             return minExp >= 0 && maxExp <= 2;
           case "2-5":
@@ -531,12 +519,11 @@ export default function Jobs() {
     if (salaryFilter) {
       const threshold = Number(salaryFilter);
       data = data.filter((job) => {
-        // Check min_salary first, then fallback to parsing salary string
         if (job.minSalary != null) {
           return job.minSalary >= threshold;
         }
         const numeric = parseSalaryValue(job.salary);
-        if (!numeric) return true; // keep jobs without salary info
+        if (!numeric) return true;
         return numeric >= threshold;
       });
     }
@@ -544,10 +531,13 @@ export default function Jobs() {
     setFiltered(data);
     setPage(1);
 
+    // Only update URL if search param actually changed
     const params = new URLSearchParams();
     if (query) params.set("search", query);
     const newUrl = params.toString() ? `/jobs?${params.toString()}` : "/jobs";
-    router.replace(newUrl);
+    if (window.location.pathname + window.location.search !== newUrl) {
+      router.replace(newUrl);
+    }
   }, [
     jobList,
     searchTerm,
@@ -560,9 +550,20 @@ export default function Jobs() {
     router,
   ]);
 
+  // Only apply filters when filter state changes, not on every searchParams change
   useEffect(() => {
     applyFilters();
-  }, [applyFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    jobList,
+    searchTerm,
+    selectedCities,
+    selectedRoles,
+    selectedJobTypes,
+    selectedWorkModes,
+    selectedExperience,
+    salaryFilter,
+  ]);
 
   // Filter out saved jobs from the list
   const filteredWithoutSaved = useMemo(
