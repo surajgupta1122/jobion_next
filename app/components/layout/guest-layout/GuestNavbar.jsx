@@ -175,7 +175,7 @@ export default function GuestNavbar() {
                     Browse Jobs
                   </Link>
                   <Link
-                    href="/modules/auth/candidate-recruiter"
+                    href="/sign-in?role=recruiter&redirect=post-job"
                     className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Post a Job
@@ -265,7 +265,7 @@ export default function GuestNavbar() {
                 <>
                   {/* Candidate Login - Navigate to sign-in page */}
                   <Link
-                    href="/modules/auth/candidate-recruiter?role=candidate"
+                    href="/sign-in?role=candidate"
                     className="hidden sm:inline-flex px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     Candidate Login
@@ -273,7 +273,7 @@ export default function GuestNavbar() {
 
                   {/* Recruiter Login - Navigate to sign-in page */}
                   <Link
-                    href="/modules/auth/candidate-recruiter?role=recruiter"
+                    href="/sign-in?role=recruiter"
                     className="px-3 lg:px-4 py-2 rounded-full text-sm font-bold text-text-muted hover:bg-gradient-to-r from-[#FB4C57] to-[#EA3D48] text-gray-500 hover:text-white hover:shadow-kinetic transition-colors"
                   >
                     <span className="hidden sm:inline">Recruiter Login</span>
