@@ -287,7 +287,7 @@ export default function Jobs() {
 
         if (data.ok && Array.isArray(data.jobs)) {
           const mapped = data.jobs.map((j: any) => ({
-            id: j._id || j.id,
+            id: String(j._id || j.id),
             roleId:
               j.roleId != null
                 ? j.roleId
@@ -1399,7 +1399,7 @@ export default function Jobs() {
                         {/* View details button - full width on mobile */}
                         <button
                           onClick={() => router.push(`/jobs/${r.id}`)}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 sm:gap-1.5 px-4 py-2.5 sm:py-1.5 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-200 hover:text-white rounded-lg transition-colors sm:bg-transparent sm:text-primary-600 sm:hover:text-primary-700 sm:p-0"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white bg-[#BB1919] hover:bg-[#AD1717] rounded-lg transition-colors"
                         >
                           View details
                           <ArrowUpRight size={16} />
