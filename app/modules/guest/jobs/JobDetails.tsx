@@ -23,12 +23,19 @@ import api from "../../../components/apiconfig/apiconfig";
 // Types
 interface Job {
   id: string | number;
-  title: string;
+  title?: string;
+  role_name?: string;
+  job_role?: string;
+  roleId?: number;
   company: string;
   description?: string;
   type?: string;
   workMode?: string;
   location?: string;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  locality?: string | null;
   minSalary?: number | null;
   maxSalary?: number | null;
   min_experience?: number | null;
@@ -42,7 +49,7 @@ interface Job {
   contactEmail?: string | null;
   contactPhone?: string | null;
   showContactPhone?: boolean;
-  city?: string | null;
+  [key: string]: any;
 }
 
 interface CandidateProfile {
@@ -69,7 +76,6 @@ const maskPhone = (phone?: string | null): string | null => {
   const digits = phone.replace(/\D/g, "");
   if (digits.length < 4) return "•••• ••••";
   const lastFour = digits.slice(-4);
-  // Format: +91 •••• ••1234
   if (phone.startsWith("+")) {
     const countryCode = phone.match(/^\+\d{1,3}/)?.[0] || "+91";
     return `${countryCode} •••• ••${lastFour}`;
@@ -87,7 +93,6 @@ const maskEmail = (email?: string | null): string | null => {
 
 const maskAddress = (address?: string | null): string | null => {
   if (!address) return null;
-  // Show first 15 characters, then mask the rest
   if (address.length <= 20) return "••••••••••••••••";
   return address.substring(0, 15) + "••••••••••";
 };
@@ -116,6 +121,61 @@ const viewResume = (
     }
     window.open(resumeUrl, "_blank");
   }
+};
+
+// Helper function to format location
+const formatLocation = (job: Job | null): string => {
+  if (!job) return "";
+  if (job.location) return job.location;
+  
+  const parts = [];
+  if (job.locality) parts.push(job.locality);
+  if (job.city) parts.push(job.city);
+  if (job.state) parts.push(job.state);
+  if (job.country && job.country !== "India") parts.push(job.country);
+  
+  return parts.length > 0 ? parts.join(", ") : "Location not specified";
+};
+
+// Helper function to get job title
+const getJobTitle = (job: Job | null): string => {
+  if (!job) return "Loading...";
+  return job.title || job.role_name || job.job_role || "Untitled Position";
+};
+
+// Helper function to map job data
+const mapJobData = (jobData: any): Job => {
+  return {
+    id: jobData.id || jobData._id,
+    role_id: jobData.role_id,
+    title: jobData.title || jobData.roleName || jobData.role_name || jobData.job_role || "Untitled Position",
+    role_name: jobData.roleName || jobData.role_name,
+    company: jobData.company || jobData.companyName || "",
+    description: jobData.description || "",
+    type: jobData.job_type || jobData.type || jobData.jobType || "",
+    workMode: jobData.work_mode || jobData.workMode || jobData.mode || "Office",
+    location: jobData.location || "",
+    city: jobData.city || null,
+    state: jobData.state || null,
+    country: jobData.country || "India",
+    locality: jobData.locality || null,
+    minSalary: jobData.min_salary || jobData.minSalary,
+    maxSalary: jobData.max_salary || jobData.maxSalary,
+    min_experience: jobData.min_experience || jobData.minExperience,
+    max_experience: jobData.max_experience || jobData.maxExperience,
+    vacancies: jobData.vacancies,
+    tags: jobData.skills || jobData.tags || [],
+    logoPath: jobData.logo_path || jobData.logoPath,
+    recruiterId: jobData.recruiter_id || jobData.recruiterId,
+    interviewAddress: jobData.interview_address || jobData.interviewAddress,
+    showInterviewAddress: jobData.show_interview_address !== false,
+    contactEmail: jobData.contact_email || jobData.contactEmail,
+    contactPhone: jobData.contact_phone || jobData.contactPhone,
+    showContactPhone: jobData.show_contact_phone !== false,
+    status: jobData.status,
+    posted_at: jobData.posted_at,
+    expires_at: jobData.expires_at,
+  };
 };
 
 export default function JobDetail() {
@@ -151,20 +211,11 @@ export default function JobDetail() {
   const [applied, setApplied] = useState(false);
 
   // Determine user access level for contact info
-  // Returns: 'full' | 'partial' | 'masked'
   const getContactAccessLevel = (): "full" | "partial" | "masked" => {
-    // Guest user - all masked
     if (!isAuthenticated) return "masked";
-
-    // Admin or recruiter - full access
     if (userRole === "admin" || userRole === "recruiter") return "full";
-
-    // Candidate who has applied - full access
     if (userRole === "candidate" && isApplied) return "full";
-
-    // Candidate who hasn't applied - partial (address visible, phone/email masked)
     if (userRole === "candidate") return "partial";
-
     return "masked";
   };
 
@@ -189,7 +240,6 @@ export default function JobDetail() {
           (app: any) => app.job_id === Number(jobId),
         );
         setIsApplied(applied);
-        // If applied, also set isSaved to false (since applied jobs can't be saved)
         if (applied) {
           setIsSaved(false);
         }
@@ -208,10 +258,11 @@ export default function JobDetail() {
         const { data } = await api.get(`/jobs/${id}`);
         if (!alive) return;
         if (data.ok && data.job) {
-          setJob(data.job);
+          console.log("Raw job data:", data.job);
+          
+          const mappedJob = mapJobData(data.job);
+          setJob(mappedJob);
           setJobPostingSchema(data.jobPostingSchema);
-
-          // Check if job is saved
           await checkSavedStatus(id);
         } else {
           setError(data.message || "Job not found");
@@ -242,7 +293,6 @@ export default function JobDetail() {
             setUserRole(data.user.role || "candidate");
             setUserId(data.user.id);
 
-            // Only fetch candidate profile and check applied status for candidates
             if (data.user.role === "candidate" || !data.user.role) {
               await loadCandidateProfile();
               await checkAppliedStatus(id);
@@ -265,7 +315,6 @@ export default function JobDetail() {
     };
   }, [id]);
 
-  // Load candidate profile for logged-in users
   const loadCandidateProfile = async (): Promise<void> => {
     setProfileLoading(true);
     try {
@@ -274,24 +323,17 @@ export default function JobDetail() {
         setCandidateProfile(res.data.user);
       }
     } catch (err) {
-      // Profile doesn't exist or error - that's okay, user will need to complete it
       setCandidateProfile(null);
     } finally {
       setProfileLoading(false);
     }
   };
 
-  // Check if profile is complete (has name and email - resume is always optional)
   const isProfileComplete = (): boolean => {
     if (!candidateProfile) return false;
-
-    const hasBasicInfo = !!(candidateProfile.full_name && userEmail);
-
-    // Resume is always optional regardless of qualification
-    return hasBasicInfo;
+    return !!(candidateProfile.full_name && userEmail);
   };
 
-  // Check if job is saved
   const checkSavedStatus = async (jobId: string): Promise<void> => {
     try {
       const response = await api.get(`/jobs/save/${jobId}`);
@@ -314,7 +356,6 @@ export default function JobDetail() {
   };
 
   const toggleSave = async (): Promise<void> => {
-    // Recruiters and admins should not save jobs
     if (shouldHideActionButtons()) {
       return;
     }
@@ -343,18 +384,15 @@ export default function JobDetail() {
 
     try {
       if (isSaved) {
-        // Unsave the job
         await api.delete(`/jobs/save/${id}`);
         setIsSaved(false);
       } else {
-        // Save the job
         await api.post(`/jobs/save/${id}`);
         setIsSaved(true);
       }
     } catch (error: any) {
       console.error("Error toggling save:", error);
       const errorMessage = error.response?.data?.message || error.message;
-      // Show specific message if trying to save an applied job
       if (errorMessage.includes("already applied")) {
         alert("Cannot save a job you have already applied to");
         setIsApplied(true);
@@ -366,7 +404,6 @@ export default function JobDetail() {
 
   const skills = job?.tags || [];
 
-  // Format salary (monthly) with rupee symbol - returns null if no salary data
   const formatSalaryMonthly = (): string | null => {
     if (!job) return null;
 
@@ -384,7 +421,6 @@ export default function JobDetail() {
     return null;
   };
 
-  // Format experience - returns null if no experience data
   const formatExperience = (): string | null => {
     if (!job) return null;
     const minExp = job.min_experience;
@@ -398,7 +434,6 @@ export default function JobDetail() {
     return null;
   };
 
-  // Redirect to login for non-logged-in users
   const redirectToLoginForApply = (): void => {
     try {
       const currentPath = window.location.pathname + window.location.search;
@@ -411,13 +446,11 @@ export default function JobDetail() {
   };
 
   const submitApplication = async (): Promise<void> => {
-    // Check authentication first
     if (!isAuthenticated) {
       redirectToLoginForApply();
       return;
     }
 
-    // For logged-in users: check if profile is complete
     if (isAuthenticated && !isProfileComplete()) {
       const missingFields = [];
       if (!candidateProfile?.full_name) missingFields.push("full name");
@@ -445,17 +478,11 @@ export default function JobDetail() {
       formData.append("job_id", id);
 
       if (isAuthenticated && candidateProfile) {
-        // For logged-in users: use profile data
-        // Only send cover letter
         if (coverLetter) formData.append("cover_letter", coverLetter);
-
-        // Always use the current resume_path from profile (updated immediately when user selects new file)
         if (candidateProfile.resume_path) {
           formData.append("resume_path", candidateProfile.resume_path);
         }
       } else {
-        // Non-logged-in users should be redirected to login
-        // This case shouldn't happen as we redirect above
         if (coverLetter) formData.append("cover_letter", coverLetter);
       }
 
@@ -466,10 +493,8 @@ export default function JobDetail() {
       if (res.data && res.data.ok) {
         showSuccess("You have successfully applied for this job!");
         setApplied(true);
-        setIsApplied(true); // Mark as applied
-        // Remove from saved jobs (if it was saved) - backend handles this automatically
+        setIsApplied(true);
         setIsSaved(false);
-        // Clear form
         setCoverLetter("");
         setUpdateResumeFile(null);
       } else {
@@ -492,12 +517,10 @@ export default function JobDetail() {
     }
   };
 
-  // Get logo URL for display
   const logoUrl = job?.logoPath
     ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/${job.logoPath}`
     : null;
 
-  // Get OG image URL (use full URL with proper domain)
   const getOgImageUrl = (): string => {
     if (job?.logoPath) {
       if (job.logoPath.startsWith("http")) {
@@ -518,7 +541,6 @@ export default function JobDetail() {
     return `${typeof window !== "undefined" ? window.location.origin : ""}/og-image.jpg`;
   };
 
-  // Render
   if (loading) return <div className="p-6 text-gray-600">Loading job...</div>;
   if (error) return <div className="p-6 text-primary-600">{error}</div>;
   if (!job) return <div className="p-6 text-gray-600">Job not found</div>;
@@ -526,21 +548,23 @@ export default function JobDetail() {
   const salary = formatSalaryMonthly();
   const experience = formatExperience();
   const ogImageUrl = getOgImageUrl();
+  const jobTitle = getJobTitle(job);
+  const jobLocation = formatLocation(job);
   const jobDescription =
     job.description?.substring(0, 160) ||
-    `Apply for ${job.title} at ${job.company}`;
+    `Apply for ${jobTitle} at ${job.company}`;
   const jobUrl = `${window.location.origin}/jobs/${job.id}`;
 
   return (
     <div className="min-h-screen bg-bg">
       <Head>
-        <title>{`${job.title} - ${job.company} | Jobion`}</title>
+        <title>{`${jobTitle} - ${job.company} | Jobion`}</title>
         <meta name="description" content={jobDescription} />
         <meta
           name="keywords"
-          content={`${job.title}, ${job.company}, jobs, career, employment, ${job.city || ""}, ${job.workMode || ""}`}
+          content={`${jobTitle}, ${job.company}, jobs, career, employment, ${job.city || ""}, ${job.workMode || ""}`}
         />
-        <meta property="og:title" content={`${job.title} - ${job.company}`} />
+        <meta property="og:title" content={`${jobTitle} - ${job.company}`} />
         <meta property="og:description" content={jobDescription} />
         <meta property="og:url" content={jobUrl} />
         <meta property="og:type" content="website" />
@@ -549,17 +573,17 @@ export default function JobDetail() {
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content={`${job.company} - ${job.title}`}
+          content={`${job.company} - ${jobTitle}`}
         />
         <meta property="og:site_name" content="Jobion" />
         <meta property="og:locale" content="en_IN" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${job.title} - ${job.company}`} />
+        <meta name="twitter:title" content={`${jobTitle} - ${job.company}`} />
         <meta name="twitter:description" content={jobDescription} />
         <meta name="twitter:image" content={ogImageUrl} />
         <meta
           name="twitter:image:alt"
-          content={`${job.company} - ${job.title}`}
+          content={`${job.company} - ${jobTitle}`}
         />
         <meta name="author" content="Jobion" />
         <meta name="theme-color" content="#BB1919" />
@@ -571,7 +595,6 @@ export default function JobDetail() {
         )}
       </Head>
 
-      {/* Add developer utility for schema copying */}
       {jobPostingSchema && process.env.NODE_ENV === "development" && (
         <div className="fixed bottom-4 right-4 z-50">
           <button
@@ -614,7 +637,7 @@ export default function JobDetail() {
                   ) : null}
                   <div className="flex-1 min-w-0">
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
-                      {job.title}
+                      {jobTitle}
                     </h1>
                     {job.company && (
                       <p className="font-medium text-gray-400 mt-1">{job.company}</p>
@@ -634,9 +657,9 @@ export default function JobDetail() {
                       <Clock size={14} /> {job.workMode}
                     </span>
                   )}
-                  {job.location && (
+                  {jobLocation && (
                     <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <MapPin size={14} /> {job.location}
+                      <MapPin size={14} /> {jobLocation}
                     </span>
                   )}
                   {experience && (
@@ -654,73 +677,84 @@ export default function JobDetail() {
 
                 {/* Details Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                  {job.company && (
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Company
-                      </label>
-                      <p className="text-sm font-semibold text-gray-700 mt-1">
-                        {job.company}
-                      </p>
-                    </div>
-                  )}
-                  {job.type && (
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Job Type
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
-                        {job.type}
-                      </p>
-                    </div>
-                  )}
+                  {/* Company */}
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      COMPANY
+                    </label>
+                    <p className="text-sm font-semibold text-gray-700 mt-1">
+                      {job.company}
+                    </p>
+                  </div>
+
+                  {/* Work Mode */}
                   {job.workMode && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Work Mode
+                        WORK MODE
                       </label>
                       <p className="text-sm font-medium text-gray-700 mt-1">
                         {job.workMode}
                       </p>
                     </div>
                   )}
-                  {job.location && (
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
-                        {job.location}
-                      </p>
-                    </div>
-                  )}
+
+                  {/* Experience */}
                   {experience && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Experience
+                        EXPERIENCE
                       </label>
                       <p className="text-sm font-medium text-gray-700 mt-1">
                         {experience}
                       </p>
                     </div>
                   )}
-                  {salary && (
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Salary
-                      </label>
-                      <p className="text-sm font-semibold text-gray-700 mt-1">
-                        {salary}
-                      </p>
-                    </div>
-                  )}
+
+                  {/* Vacancies */}
                   {job.vacancies && job.vacancies > 0 && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Vacancies
+                        VACANCIES
                       </label>
                       <p className="text-sm font-medium text-gray-700 mt-1">
                         {job.vacancies}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Job Type */}
+                  {job.type && (
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        JOB TYPE
+                      </label>
+                      <p className="text-sm font-medium text-gray-700 mt-1">
+                        {job.type}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Location */}
+                  {jobLocation && (
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        LOCATION
+                      </label>
+                      <p className="text-sm font-medium text-gray-700 mt-1">
+                        {jobLocation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Salary */}
+                  {salary && (
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        SALARY
+                      </label>
+                      <p className="text-sm font-semibold text-gray-700 mt-1">
+                        {salary}
                       </p>
                     </div>
                   )}
@@ -906,7 +940,6 @@ export default function JobDetail() {
                       ? "Job Summary"
                       : "Apply to this job"}
                   </h2>
-                  {/* Show Save button only for candidates who haven't applied */}
                   {!shouldHideActionButtons() && !isApplied && (
                     <button
                       onClick={toggleSave}
@@ -931,9 +964,6 @@ export default function JobDetail() {
                 </div>
               </div>
               <div className="p-4 sm:p-6">
-                {/* Quick Summary */}
-
-                {/* STATE 4 & 5: Recruiter or Admin viewing job - No action buttons */}
                 {shouldHideActionButtons() && (
                   <div className="space-y-4">
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-center">
@@ -950,7 +980,6 @@ export default function JobDetail() {
                   </div>
                 )}
 
-                {/* STATE 3: Candidate who has applied */}
                 {!shouldHideActionButtons() && isAuthenticated && isApplied && (
                   <div className="space-y-4">
                     <div className="bg-success-light border border-success-300 rounded-lg p-4 text-center">
@@ -968,7 +997,6 @@ export default function JobDetail() {
                   </div>
                 )}
 
-                {/* STATE 2: Logged-in candidate who hasn't applied */}
                 {!shouldHideActionButtons() &&
                   isAuthenticated &&
                   !isApplied &&
@@ -1045,11 +1073,9 @@ export default function JobDetail() {
                                 return;
                               }
 
-                              // Clear any previous errors
                               setError(null);
 
                               try {
-                                // Upload the file immediately to update profile
                                 const formData = new FormData();
                                 formData.append("resume", f);
                                 formData.append("user_id", userId as string);
@@ -1065,14 +1091,11 @@ export default function JobDetail() {
                                 );
 
                                 if (uploadRes?.data?.success) {
-                                  // Update the candidate profile with new resume path
                                   setCandidateProfile((prev) => ({
                                     ...prev,
                                     resume_path: uploadRes.data.resume_path,
                                   }));
                                   showSuccess("Resume updated successfully!");
-
-                                  // Clear the file input
                                   e.target.value = "";
                                 } else {
                                   showError("Failed to upload resume");
@@ -1103,7 +1126,6 @@ export default function JobDetail() {
                         />
                       </div>
 
-                      {/* Resume Section */}
                       {candidateProfile && (
                         <>
                           <div className="space-y-3">
@@ -1124,7 +1146,6 @@ export default function JobDetail() {
                     </div>
                   )}
 
-                {/* STATE 2 (alt): Logged-in candidate without profile loaded yet */}
                 {!shouldHideActionButtons() &&
                   isAuthenticated &&
                   !isApplied &&
@@ -1134,7 +1155,6 @@ export default function JobDetail() {
                       <button
                         className="btn btn-primary btn-md w-full"
                         onClick={() => {
-                          // Store job info for redirect after profile creation
                           try {
                             const currentPath =
                               window.location.pathname + window.location.search;
@@ -1158,7 +1178,6 @@ export default function JobDetail() {
                     </div>
                   )}
 
-                {/* STATE 1: Guest user (not logged in) */}
                 {!shouldHideActionButtons() && !isAuthenticated && (
                   <div className="space-y-4">
                     <div className="bg-gray-50 border border-gray-200 rounded-3xl p-4 text-sm text-center">
@@ -1176,7 +1195,6 @@ export default function JobDetail() {
                   </div>
                 )}
 
-                {/* Loading state */}
                 {!shouldHideActionButtons() &&
                   isAuthenticated &&
                   !isApplied &&

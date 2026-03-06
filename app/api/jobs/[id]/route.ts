@@ -46,14 +46,44 @@ export async function GET(req: Request, context: any) {
       [rows[0][idColumn]],
     );
 
+    const jobData = rows[0];
+    
     return NextResponse.json({
       ok: true,
       job: {
-        ...rows[0],
+        id: jobData.id,
+        _id: jobData._id,
+        role_id: jobData.role_id,
+        title: jobData.roleName, // Add title field
+        roleName: jobData.roleName,
+        company: jobData.company,
+        job_type: jobData.job_type,
+        work_mode: jobData.work_mode,
+        city: jobData.city,
+        state: jobData.state,
+        country: jobData.country,
+        locality: jobData.locality,
+        min_experience: jobData.min_experience,
+        max_experience: jobData.max_experience,
+        min_salary: jobData.min_salary,
+        max_salary: jobData.max_salary,
+        vacancies: jobData.vacancies,
+        description: jobData.description,
+        interview_address: jobData.interview_address,
+        contact_email: jobData.contact_email,
+        contact_phone: jobData.contact_phone,
+        logo_path: jobData.logo_path,
+        recruiter_id: jobData.recruiter_id,
+        status: jobData.status,
+        posted_at: jobData.posted_at,
+        expires_at: jobData.expires_at,
+        show_interview_address: jobData.show_interview_address,
+        show_contact_phone: jobData.show_contact_phone,
         skills: tags.map((t: any) => t.name),
       },
     });
   } catch (err: any) {
+    console.error("[API /api/jobs/[id]] error:", err);
     return NextResponse.json({ ok: false, message: err.message });
   }
 }
