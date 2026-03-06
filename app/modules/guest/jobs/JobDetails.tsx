@@ -853,23 +853,23 @@ export default function JobDetail() {
                     <div className="flex items-start gap-3">
                       <Mail
                         size={18}
-                        className="text-primary-500 flex-shrink-0 mt-0.5"
+                        className="text-[#dc2626] flex-shrink-0 mt-0.5"
                       />
                       <div className="flex-1">
-                        <label className="text-xs font-medium text-text-muted uppercase tracking-wider">
+                        <label className="text-xs font-medium text-gray-600 uppercase tracking-wider">
                           Contact Email
                         </label>
                         {getContactAccessLevel() === "full" ? (
-                          <p className="text-text-dark mt-1">
+                          <p className="text-gray-600 mt-1">
                             <a
                               href={`mailto:${job.contactEmail}`}
-                              className="text-primary-600 hover:underline"
+                              className="text-[#dc2626] hover:underline"
                             >
                               {job.contactEmail}
                             </a>
                           </p>
                         ) : (
-                          <p className="text-text-muted mt-1 font-mono text-sm">
+                          <p className="text-gray-600 mt-1 font-mono text-sm">
                             {maskEmail(job.contactEmail)}
                           </p>
                         )}
@@ -882,23 +882,23 @@ export default function JobDetail() {
                     <div className="flex items-start gap-3">
                       <Phone
                         size={18}
-                        className="text-primary-500 flex-shrink-0 mt-0.5"
+                        className="text-[#dc2626] flex-shrink-0 mt-0.5"
                       />
                       <div className="flex-1">
-                        <label className="text-xs font-medium text-text-muted uppercase tracking-wider">
+                        <label className="text-xs font-medium text-gray-600 uppercase tracking-wider">
                           Contact Phone
                         </label>
                         {getContactAccessLevel() === "full" ? (
-                          <p className="text-text-dark mt-1">
+                          <p className="text-gray-600 mt-1">
                             <a
                               href={`tel:${job.contactPhone}`}
-                              className="text-primary-600 hover:underline"
+                              className="text-[#dc2626] hover:underline"
                             >
                               {job.contactPhone}
                             </a>
                           </p>
                         ) : (
-                          <p className="text-text-muted mt-1 font-mono text-sm">
+                          <p className="text-gray-600 mt-1 font-mono text-sm">
                             {maskPhone(job.contactPhone)}
                           </p>
                         )}
