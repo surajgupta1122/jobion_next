@@ -7,7 +7,6 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const handleGoogleSuccessRef = useRef(null);
 
   // Decide where to send based on role + profile existence
@@ -36,11 +35,6 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
 
   // GOOGLE LOGIN SUCCESS HANDLER
   const handleGoogleSuccess = useCallback(async (response) => {
-    if (!termsAccepted) {
-      setError("Please accept the Terms & Conditions and Privacy Policy to continue.");
-      return;
-    }
-
     setLoading(true);
     setError("");
     setMessage("");
@@ -74,7 +68,7 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
       setError(err?.response?.data?.message || "Google login failed");
       setLoading(false);
     }
-  }, [termsAccepted, role, resolveRedirect]);
+  }, [role, resolveRedirect]);
 
   // Keep ref updated
   useEffect(() => {
@@ -121,7 +115,6 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
             width: 320,
             type: "standard",
             text: "signin_with", // "Sign in with Google"
-            disabled: !termsAccepted,
           });
         }
       } catch (err) {
@@ -131,7 +124,7 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
 
     // Start initialization
     initializeGoogleAuth();
-  }, [role, termsAccepted]);
+  }, [role]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -158,30 +151,19 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
 
           <div className="px-6 pb-6 space-y-4">
             <div className="flex flex-col items-center gap-4">
-              {/* Terms & Conditions Checkbox */}
-              <div className="flex items-start gap-2 w-full pt-2">
-                <input
-                  type="checkbox"
-                  id="terms-checkbox-modal"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  required
-                />
-                <label htmlFor="terms-checkbox-modal" className="text-xs text-gray-700 cursor-pointer">
-                  I agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-primary-600 hover:underline">
-                    Terms & Conditions
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" target="_blank" className="text-primary-600 hover:underline">
-                    Privacy Policy
-                  </Link>{" "}
-                  of Jobion.
-                </label>
-              </div>
-
               <div id="google-login-btn" className="flex justify-center w-full" />
+
+              <p className="text-xs text-gray-500/80 text-center mt-2">
+                By signing in, you agree to our{" "}
+                <Link href="/terms" target="_blank" className="text-primary-600 hover:underline">
+                  Terms & Conditions
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" target="_blank" className="text-primary-600 hover:underline">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
 
               {loading && (
                 <p className="text-sm text-slate-500 text-center">

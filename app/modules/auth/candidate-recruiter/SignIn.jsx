@@ -38,7 +38,6 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const pathname = usePathname();
   const handleGoogleSuccessRef = useRef(null);
 
@@ -170,13 +169,6 @@ export default function SignIn() {
   // GOOGLE LOGIN SUCCESS HANDLER
   const handleGoogleSuccess = useCallback(
     async (response) => {
-      if (!termsAccepted) {
-        setError(
-          "Please accept the Terms & Conditions and Privacy Policy to continue.",
-        );
-        return;
-      }
-
       setLoading(true);
       setError("");
       setMessage("");
@@ -217,7 +209,7 @@ export default function SignIn() {
         setLoading(false);
       }
     },
-    [termsAccepted, role, consumePostLoginTasks],
+    [role, consumePostLoginTasks],
   );
 
   // Keep ref updated
@@ -273,12 +265,6 @@ export default function SignIn() {
       );
       return;
     }
-    if (!termsAccepted) {
-      setError(
-        "Please accept the Terms & Conditions and Privacy Policy to continue.",
-      );
-      return;
-    }
     if (
       typeof window !== "undefined" &&
       window.google?.accounts?.id
@@ -322,10 +308,10 @@ export default function SignIn() {
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <label
-                      className={`flex items-center gap-2.5 p-3 sm:p-4 border-2 rounded-2xl cursor-pointer transition-all ${
+                      className={`flex items-center gap-2.5 p-2.5 sm:p-3 border rounded-xl cursor-pointer transition-all ${
                         role === "candidate"
-                          ? "border-[#BB1919] bg-[#FDE8E8] shadow-soft"
-                          : "border-gray-200 hover:border-[#E57373] hover:bg-gray-50"
+                          ? "border-red-600 bg-red-50"
+                          : "border-gray-300 bg-gray-50 hover:bg-gray-100"
                       }`}
                     >
                       <input
@@ -334,18 +320,18 @@ export default function SignIn() {
                         value="candidate"
                         checked={role === "candidate"}
                         onChange={() => setRole("candidate")}
-                        className="w-4 h-4 text-[#AD1717] focus:ring-[#BB1919] cursor-pointer"
+                        className="w-4 h-4 text-red-600 focus:ring-red-500 cursor-pointer flex-shrink-0"
                       />
-                      <span className="font-semibold text-sm sm:text-base text-gray-900/96">
+                      <span className="font-medium text-sm sm:text-base text-gray-900">
                         Candidate
                       </span>
                     </label>
 
                     <label
-                      className={`flex items-center gap-2.5 p-3 sm:p-4 border-2 rounded-2xl cursor-pointer transition-all ${
+                      className={`flex items-center gap-2.5 p-2.5 sm:p-3 border rounded-xl cursor-pointer transition-all ${
                         role === "recruiter"
-                          ? "border-[#BB1919] bg-[#FDE8E8] shadow-soft"
-                          : "border-gray-200 hover:border-[#E57373] hover:bg-gray-50"
+                          ? "border-red-600 bg-red-50"
+                          : "border-gray-300 bg-gray-50 hover:bg-gray-100"
                       }`}
                     >
                       <input
@@ -354,58 +340,44 @@ export default function SignIn() {
                         value="recruiter"
                         checked={role === "recruiter"}
                         onChange={() => setRole("recruiter")}
-                        className="w-4 h-4 text-[#AD1717] focus:ring-[#BB1919] cursor-pointer"
+                        className="w-4 h-4 text-red-600 focus:ring-red-500 cursor-pointer flex-shrink-0"
                       />
-                      <span className="font-semibold text-sm sm:text-base text-gray-900/96">
+                      <span className="font-medium text-sm sm:text-base text-gray-900">
                         Recruiter
                       </span>
                     </label>
                   </div>
                 </div>
 
-                {/* Terms & Conditions Checkbox */}
-                <div className="flex items-start gap-2.5 pt-2">
-                  <input
-                    type="checkbox"
-                    id="terms-checkbox"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 text-[#AD1717] focus:ring-[#8F1212] border-gray-200 rounded cursor-pointer"
-                    required
-                  />
-                  <label
-                    htmlFor="terms-checkbox"
-                    className="text-xs sm:text-sm text-gray-500/96 font-medium cursor-pointer leading-relaxed"
-                  >
-                    I agree to the{" "}
-                    <Link
-                      href="/terms"
-                      target="_blank"
-                      className="text-[#AD1717] hover:text-[#8F1212] hover:underline font-medium"
-                    >
-                      Terms & Conditions
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      href="/privacy"
-                      target="_blank"
-                      className="text-[#AD1717] hover:text-[#8F1212] hover:underline font-medium"
-                    >
-                      Privacy Policy
-                    </Link>{" "}
-                    of Jobion.
-                  </label>
-                </div>
-
                 <button
                   type="button"
                   onClick={handleGoogleButtonClick}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 px-5 py-4 mt-8 bg-white border border-gray-300 rounded-xl font-semibold text-gray-700 shadow-md hover:shadow-lg hover:border-gray-400 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <GoogleIcon />
                   Sign in with Google
                 </button>
+
+                <p className="text-xs text-gray-500/80 text-center mt-2">
+                  By signing in, you agree to our{" "}
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="text-[#AD1717] hover:text-[#8F1212] hover:underline"
+                  >
+                    Terms & Conditions
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="text-[#AD1717] hover:text-[#8F1212] hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </p>
 
                 {message && (
                   <div className="text-[success-600] text-sm text-center bg-success-light border border-success-300 rounded-lg px-4 py-2.5">
