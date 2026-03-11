@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, JSX } from "react";
 import Link from "next/link";
 import api from "../../../components/apiconfig/apiconfig";

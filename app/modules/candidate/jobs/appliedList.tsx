@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Building2,
   MapPin,
@@ -48,6 +49,7 @@ export default function Applied() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const fetchAppliedJobs = async (): Promise<void> => {
     try {
@@ -62,11 +64,15 @@ export default function Applied() {
       }
     } catch (err: any) {
       console.error("Fetch error:", err);
+      if (err?.response?.status === 401) {
+        router.push("/sign-in?role=candidate&redirect=/dashboard/applied");
+        return;
+      }
       setError(
         err?.response?.data?.error ||
-          err?.response?.data?.message ||
-          err.message ||
-          "Failed to load applications",
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to load applications",
       );
     } finally {
       setLoading(false);
@@ -187,12 +193,7 @@ export default function Applied() {
                 >
                   Browse Jobs
                 </button>
-                <button
-                  onClick={() => (window.location.href = "/dashboard/profile")}
-                  className="btn btn-ghost px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Update Profile
-                </button>
+
               </div>
             </div>
           </div>

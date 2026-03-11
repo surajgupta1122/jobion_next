@@ -11,7 +11,7 @@ import { ToastContainer } from '../../toast';
 const CandidateLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-white">
-      <CandidateHeader />
+      
       <main className="flex-1">
         <ErrorBoundary>
           {children}

@@ -18,6 +18,20 @@ const GuestLayout = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Recruiter pages render their own header/layout
+  const recruiterRoutes = [
+    "/recruiter-dashboard",
+    "/job-posted",
+    "/create-job",
+    "/recruiter-profile",
+    "/recruiter-profile-form",
+    "/recruiter/jobs",
+  ];
+
+  const isRecruiterRoute =
+    recruiterRoutes.includes(pathname) ||
+    recruiterRoutes.some((p) => pathname.startsWith(p + "/"));
+
   // Routes where we DON'T want to show the footer or candidate header
   const authRoutes = [
     "/sign-in",
@@ -68,15 +82,17 @@ const GuestLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header>
-        {showCandidateHeader ? <CandidateHeader /> : <GuestNavbar />}
-      </header>
+      {!isRecruiterRoute && (
+        <header>
+          {showCandidateHeader ? <CandidateHeader /> : <GuestNavbar />}
+        </header>
+      )}
 
       <main className="flex-1">
         <ErrorBoundary>{children}</ErrorBoundary>
       </main>
 
-      {!hideFooter && (
+      {!hideFooter && !isRecruiterRoute && (
         <footer>
           <GuestFooter />
         </footer>

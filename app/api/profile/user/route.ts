@@ -5,15 +5,20 @@ import db from "@/app/lib/db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-function getUser() {
-  const token = cookies().get("token")?.value;
+async function getUser() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
   if (!token) return null;
-  return jwt.verify(token, process.env.JWT_SECRET!);
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET!);
+  } catch {
+    return null;
+  }
 }
 
 export async function GET() {
   try {
-    const user: any = getUser();
+    const user: any = await getUser();
 
     if (!user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

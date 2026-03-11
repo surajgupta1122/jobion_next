@@ -36,6 +36,7 @@ interface ApiResponse {
 
 interface ApiError {
   response?: {
+    status?: number;
     data?: {
       message?: string;
     };
@@ -64,6 +65,10 @@ export default function Saved() {
     } catch (err: unknown) {
       console.error("Error fetching saved jobs:", err);
       const apiError = err as ApiError;
+      if (apiError.response?.status === 401) {
+        router.push("/sign-in?role=candidate&redirect=/dashboard/saved");
+        return;
+      }
       if (apiError.response?.data?.message) {
         setError(apiError.response.data.message);
       } else if (apiError.message) {
@@ -244,10 +249,6 @@ export default function Saved() {
                             {job.company}
                           </p>
                         </div>
-                        <span className="px-3 py-1.5 bg-primary-50 text-primary-700 border border-primary-200 rounded-lg text-sm font-medium inline-flex items-center gap-1.5 self-start">
-                          <Star size={14} />
-                          Saved
-                        </span>
                       </div>
 
                       {/* Job Info */}
@@ -285,17 +286,17 @@ export default function Saved() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 lg:flex-col">
+                    <div className="flex gap-2 lg:flex-col shrink-0 w-full sm:w-auto sm:min-w-[140px]">
                       <button
                         onClick={() => handleViewJob(job.id)}
-                        className="btn btn-primary px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-1.5 flex-1 lg:flex-none justify-center"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-1.5 flex-1 lg:flex-none justify-center whitespace-nowrap"
                       >
                         <Eye size={16} />
                         View Job
                       </button>
                       <button
                         onClick={() => removeSavedJob(job.job_id)}
-                        className="btn btn-ghost px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors flex items-center gap-1.5 flex-1 lg:flex-none justify-center"
+                        className="px-4 py-2 text-sm font-medium text-red-700 bg-white border border-gray-300 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-1.5 flex-1 lg:flex-none justify-center whitespace-nowrap"
                       >
                         <Trash2 size={16} />
                         Remove

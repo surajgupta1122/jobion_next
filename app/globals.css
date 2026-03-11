@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Pointer cursor for all interactive/clickable elements */
+button,
+[role="button"],
+a,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select,
+summary,
+label[for] {
+  cursor: pointer;
+}

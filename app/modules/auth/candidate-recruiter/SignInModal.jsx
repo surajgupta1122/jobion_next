@@ -15,8 +15,7 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
     try {
       if (resolvedRole === "recruiter") {
         await api.get("/recruiter-profile/recruiter");
-        // Profile exists - redirect to Post Job page (default dashboard view)
-        return "/create-job";
+        return "/recruiter-dashboard";
       }
 
       await api.get("/profile/user");
@@ -24,7 +23,6 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
     } catch (err) {
       const status = err?.response?.status;
       if (status === 404) {
-        // If coming from "post a job" flow and profile doesn't exist, go to profile form
         if (resolvedRole === "recruiter" && redirectTo === "post-job") {
           return "/recruiter-profile-form";
         }
@@ -32,7 +30,7 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
           ? "/recruiter-profile-form"
           : "/dashboard/profile";
       }
-      return resolvedRole === "recruiter" ? "/create-job" : "/dashboard";
+      return resolvedRole === "recruiter" ? "/recruiter-dashboard" : "/dashboard";
     }
   }, [redirectTo]);
 
@@ -64,11 +62,11 @@ export default function SignInModal({ role = "candidate", onClose, redirectTo = 
       } catch (redirectErr) {
         console.error("Google sign-in (modal): Error determining redirect", redirectErr);
         // Use fallback
-        redirectPath = userRole === "recruiter" ? "/create-job" : "/dashboard";
+        redirectPath = userRole === "recruiter" ? "/recruiter-dashboard" : "/dashboard";
       }
 
       if (!redirectPath) {
-        redirectPath = userRole === "recruiter" ? "/create-job" : "/dashboard";
+        redirectPath = userRole === "recruiter" ? "/recruiter-dashboard" : "/dashboard";
       }
       window.location.replace(redirectPath);
     } catch (err) {

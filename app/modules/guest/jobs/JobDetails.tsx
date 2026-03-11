@@ -486,7 +486,7 @@ export default function JobDetail() {
         if (coverLetter) formData.append("cover_letter", coverLetter);
       }
 
-      const res = await api.post("/jobs/apply", formData, {
+      const res = await api.post(`/jobs/apply/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

@@ -12,10 +12,8 @@ function GuestFooter(){
           {/* Brand / description */}
           <div className="space-y-3 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2.5">
-              <b className="text-lg font-bold tracking-wide bg-gradient-to-r from-[#AD1717] via-[#971414] to-[#971414] bg-clip-text text-transparent drop-shadow-sm hover:from-[#971414] hover:via-[#811111] hover:to-[#6B0E0E] transition-all duration-300">
-                Job<span className="relative">
-                  <span className="text-red-800 font-bold text-lg">i</span>
-                </span>on
+              <b className="text-lg font-bold tracking-wide text-red-700 drop-shadow-sm">
+                Job<span className="text-red-900 font-bold text-lg">i</span>on
               </b>
             </div>
             <p className="text-xs sm:text-sm text-gray-500/90 font-medium max-w-xs leading-relaxed">

@@ -188,11 +188,11 @@ export default function Hero(): JSX.Element {
   };
 
   return (
-    <section className="min-h-[85vh] m-12 flex items-center justify-center bg-gray-[#FFFFFF] px-4">
-      <div className="max-w-5xl w-full text-center ">
+    <section className="min-h-[80vh] w-full flex items-center justify-center bg-white px-4 pt-16 pb-20">
+      <div className="max-w-6xl w-full text-center">
 
         {/* Heading */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight mb-5">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.3rem] font-extrabold text-gray-900 leading-tight mb-6">
           Trusted Opportunities for{" "}
           <span className="text-[#BB1919] ">Fresh Talent</span>
         </h1>
@@ -226,7 +226,7 @@ export default function Hero(): JSX.Element {
         )}
 
         {/* Search Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <div className="bg-[#F7F7FB] border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-md max-w-5xl mx-auto">
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
