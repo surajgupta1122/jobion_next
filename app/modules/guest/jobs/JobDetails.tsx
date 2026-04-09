@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Head from "next/head";
 import { useToast } from "../../../components/toast/ToastContext";
 import api from "../../../components/apiconfig/apiconfig";
 
@@ -69,6 +68,10 @@ interface UserSession {
 interface JobPostingSchema {
   [key: string]: any;
 }
+
+type JobDetailsProps = {
+  initialJob?: Job | null;
+};
 
 // Utility functions to mask contact information
 const maskPhone = (phone?: string | null): string | null => {
@@ -178,15 +181,15 @@ const mapJobData = (jobData: any): Job => {
   };
 };
 
-export default function JobDetail() {
+export default function JobDetail({ initialJob = null }: JobDetailsProps) {
   const params = useParams();
   const id = params?.id as string;
   const router = useRouter();
   const { showSuccess, showError } = useToast();
-  const [job, setJob] = useState<Job | null>(null);
+  const [job, setJob] = useState<Job | null>(initialJob);
   const [jobPostingSchema, setJobPostingSchema] =
     useState<JobPostingSchema | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialJob);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
@@ -254,6 +257,12 @@ export default function JobDetail() {
     let alive = true;
     (async () => {
       try {
+        if (initialJob) {
+          // Already have the job from server render; still refresh save/applied state below.
+          await checkSavedStatus(id);
+          return;
+        }
+
         setLoading(true);
         const { data } = await api.get(`/jobs/${id}`);
         if (!alive) return;
@@ -279,7 +288,7 @@ export default function JobDetail() {
     return () => {
       alive = false;
     };
-  }, [id]);
+  }, [id, initialJob]);
 
   useEffect(() => {
     let alive = true;
@@ -547,54 +556,14 @@ export default function JobDetail() {
 
   const salary = formatSalaryMonthly();
   const experience = formatExperience();
-  const ogImageUrl = getOgImageUrl();
   const jobTitle = getJobTitle(job);
   const jobLocation = formatLocation(job);
   const jobDescription =
     job.description?.substring(0, 160) ||
     `Apply for ${jobTitle} at ${job.company}`;
-  const jobUrl = `${window.location.origin}/jobs/${job.id}`;
 
   return (
     <div className="min-h-screen bg-bg">
-      <Head>
-        <title>{`${jobTitle} - ${job.company} | Jobion`}</title>
-        <meta name="description" content={jobDescription} />
-        <meta
-          name="keywords"
-          content={`${jobTitle}, ${job.company}, jobs, career, employment, ${job.city || ""}, ${job.workMode || ""}`}
-        />
-        <meta property="og:title" content={`${jobTitle} - ${job.company}`} />
-        <meta property="og:description" content={jobDescription} />
-        <meta property="og:url" content={jobUrl} />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content={ogImageUrl} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-          property="og:image:alt"
-          content={`${job.company} - ${jobTitle}`}
-        />
-        <meta property="og:site_name" content="Jobion" />
-        <meta property="og:locale" content="en_IN" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${jobTitle} - ${job.company}`} />
-        <meta name="twitter:description" content={jobDescription} />
-        <meta name="twitter:image" content={ogImageUrl} />
-        <meta
-          name="twitter:image:alt"
-          content={`${job.company} - ${jobTitle}`}
-        />
-        <meta name="author" content="Jobion" />
-        <meta name="theme-color" content="#BB1919" />
-        <link rel="canonical" href={jobUrl} />
-        {jobPostingSchema && (
-          <script type="application/ld+json">
-            {JSON.stringify(jobPostingSchema, null, 2)}
-          </script>
-        )}
-      </Head>
-
       {jobPostingSchema && process.env.NODE_ENV === "development" && (
         <div className="fixed bottom-4 right-4 z-50">
           <button

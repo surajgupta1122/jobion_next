@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "../../../../lib/db";
 import { getUser } from "../../../../lib/auth";
+import { sendEmail } from "@/app/lib/mailer";
 
 export async function POST(req: Request, context: any) {
   const user = await getUser();
@@ -40,6 +41,35 @@ export async function POST(req: Request, context: any) {
 
     if (result?.affectedRows === 0) {
       return NextResponse.json({ ok: true, message: "Already applied" });
+    }
+
+    // Email recruiter (best effort): new applicant applied
+    try {
+      const [rows]: any = await db.query(
+        `
+        SELECT
+          u.email AS recruiter_email,
+          r.name AS job_title,
+          j.company
+        FROM jobs j
+        LEFT JOIN users u ON u.id = j.recruiter_id
+        LEFT JOIN job_roles r ON r.id = j.role_id
+        WHERE j.id = ?
+        LIMIT 1
+      `,
+        [jobId],
+      );
+      const recEmail = rows?.[0]?.recruiter_email;
+      if (recEmail) {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jobion.in";
+        await sendEmail({
+          to: recEmail,
+          subject: `New application received: ${rows?.[0]?.job_title || "Job"} (${rows?.[0]?.company || ""})`,
+          text: `You received a new application.\n\nJob: ${rows?.[0]?.job_title || "Job"}\nCompany: ${rows?.[0]?.company || ""}\n\nView applicants: ${siteUrl}/recruiter/jobs/${jobId}/applicants`,
+        });
+      }
+    } catch (e) {
+      console.error("[email recruiter new application] failed:", e);
     }
 
     return NextResponse.json({ ok: true, message: "Applied" });

@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import db from "@/app/lib/db";
 import { getUser } from "@/app/lib/auth";
+import { sendEmail } from "@/app/lib/mailer";
 
 function asStatus(raw: unknown): "shortlisted" | "rejected" | null {
   const v = String(raw || "").toLowerCase().trim();
@@ -102,6 +103,24 @@ export async function PATCH(req: Request, context: any) {
       );
     } catch {
       // ignore notifications errors
+    }
+
+    // Email candidate (best effort): shortlisted/rejected update
+    try {
+      const [uRows]: any = await db.query(`SELECT email FROM users WHERE id = ? LIMIT 1`, [
+        row.candidate_user_id,
+      ]);
+      const candidateEmail = uRows?.[0]?.email;
+      if (candidateEmail) {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jobion.in";
+        await sendEmail({
+          to: candidateEmail,
+          subject: title,
+          text: `${message}\n\nView your applications: ${siteUrl}/dashboard/applied`,
+        });
+      }
+    } catch (e) {
+      console.error("[email candidate status] failed:", e);
     }
 
     return NextResponse.json({ ok: true, status: nextStatus });

@@ -29,6 +29,7 @@ export default function MyJobs() {
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [openMenuJobId, setOpenMenuJobId] = useState<number | null>(null);
+  const [renewingId, setRenewingId] = useState<number | null>(null);
 
   const load = async () => {
     try {
@@ -65,6 +66,28 @@ export default function MyJobs() {
       .sort((a, b) => a.ts - b.ts)
       .slice(0, 1);
   }, [jobs]);
+
+  const canRenew = (expiresAt?: string | null) => {
+    if (!expiresAt) return false;
+    const exp = new Date(expiresAt).getTime();
+    if (!Number.isFinite(exp)) return false;
+    const now = Date.now();
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    return now >= exp - sevenDaysMs;
+  };
+
+  const renew = async (jobId: number) => {
+    try {
+      setRenewingId(jobId);
+      const { data } = await api.patch(`/jobs/${jobId}/renew`);
+      if (!data?.ok) throw new Error(data?.message || "Failed to renew job");
+      await load();
+    } catch (e: any) {
+      alert(e?.response?.data?.message || e?.message || "Failed to renew job");
+    } finally {
+      setRenewingId((prev) => (prev === jobId ? null : prev));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -114,6 +137,23 @@ export default function MyJobs() {
             <div className="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-200 rounded-full px-3 py-1">
               {daysLeftLabel(expiringSoon[0].job.expires_at)}
             </div>
+            <button
+              type="button"
+              onClick={() => renew(expiringSoon[0].job.id)}
+              disabled={!canRenew(expiringSoon[0].job.expires_at) || renewingId === expiringSoon[0].job.id}
+              className={`ml-2 text-xs font-semibold px-3 py-1 rounded-full border ${
+                !canRenew(expiringSoon[0].job.expires_at) || renewingId === expiringSoon[0].job.id
+                  ? "border-amber-200 text-amber-300 bg-amber-50 cursor-not-allowed"
+                  : "border-amber-300 text-amber-900 bg-white hover:bg-amber-100"
+              }`}
+              title={
+                canRenew(expiringSoon[0].job.expires_at)
+                  ? "Renew (extends expiry by 30 days)"
+                  : "Renewal allowed only within 7 days of expiry"
+              }
+            >
+              {renewingId === expiringSoon[0].job.id ? "Renewing…" : "Renew"}
+            </button>
           </div>
         </div>
       )}
@@ -190,6 +230,27 @@ export default function MyJobs() {
                         >
                           View Job
                         </Link>
+                        <button
+                          type="button"
+                          className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 ${
+                            canRenew(job.expires_at)
+                              ? "text-emerald-700"
+                              : "text-gray-400 cursor-not-allowed"
+                          }`}
+                          disabled={!canRenew(job.expires_at) || renewingId === job.id}
+                          onClick={() => {
+                            if (!canRenew(job.expires_at)) return;
+                            setOpenMenuJobId(null);
+                            void renew(job.id);
+                          }}
+                          title={
+                            canRenew(job.expires_at)
+                              ? "Renew (extends expiry by 30 days)"
+                              : "Renewal allowed only within 7 days of expiry"
+                          }
+                        >
+                          {renewingId === job.id ? "Renewing…" : "Renew Job"}
+                        </button>
                         <button
                           type="button"
                           className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"

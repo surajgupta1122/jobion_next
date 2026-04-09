@@ -35,6 +35,14 @@ export async function GET(req: Request, context: any) {
       return NextResponse.json({ ok: false, message: "Not found" });
     }
 
+    // Option A: treat expired jobs as removed
+    if (rows?.[0]?.expires_at) {
+      const exp = new Date(rows[0].expires_at);
+      if (!Number.isNaN(exp.getTime()) && exp.getTime() <= Date.now()) {
+        return NextResponse.json({ ok: false, message: "Not found" }, { status: 404 });
+      }
+    }
+
     // Use the same id column for tags
     const [tags]: any = await db.query(
       `

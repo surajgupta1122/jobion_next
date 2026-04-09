@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import db from "@/app/lib/db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { sendEmail } from "@/app/lib/mailer";
 
 async function getUser() {
   const cookieStore = await cookies();
@@ -166,6 +167,24 @@ export async function POST(req: Request) {
           }
         } catch {
           // ignore tag mapping errors
+        }
+      }
+    }
+
+    // Email admin (best effort): new job pending approval
+    if (jobId) {
+      const adminTo =
+        process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_EMAIL || process.env.EMAIL_FROM;
+      if (adminTo) {
+        try {
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jobion.in";
+          await sendEmail({
+            to: adminTo,
+            subject: `New job pending approval (#${jobId})`,
+            text: `A new job was posted and is waiting for approval.\n\nCompany: ${company}\nCity: ${city}\nJob ID: ${jobId}\n\nReview: ${siteUrl}/admin/jobs (Pending tab)`,
+          });
+        } catch (e) {
+          console.error("[email admin new job] failed:", e);
         }
       }
     }

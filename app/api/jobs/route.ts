@@ -20,6 +20,7 @@ export async function GET() {
       FROM jobs j
       LEFT JOIN job_roles r ON j.role_id = r.id
       WHERE j.status IN ('approved','pending')
+        AND (j.expires_at IS NULL OR j.expires_at > NOW())
       ORDER BY j.created_at DESC
     `);
     console.log(`📄 fetched ${jobs.length} jobs from database`);

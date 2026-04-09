@@ -49,6 +49,8 @@ export async function GET(req: Request) {
         j.city,
         j.state,
         j.created_at,
+        j.expires_at,
+        j.posted_at,
         j.status,
         u.email AS recruiter_email
       FROM jobs j
