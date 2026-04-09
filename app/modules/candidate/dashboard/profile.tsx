@@ -1511,18 +1511,21 @@ interface ProfileViewProps {
 function ProfileView({ user, onEdit }: ProfileViewProps) {
   if (!user) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
-            <User size={32} className="text-primary-600" />
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+        <div className="p-10 text-center">
+          <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4 ring-2 ring-primary-100">
+            <User size={36} className="text-primary-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
             No Profile Found
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-sm">
             Create your professional profile to get started
           </p>
-          <button onClick={onEdit} className="btn btn-primary p-2">
+          <button
+            onClick={onEdit}
+            className="btn btn-primary px-5 py-2.5 text-sm font-semibold"
+          >
             Create Profile
           </button>
         </div>
@@ -1530,43 +1533,117 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
     );
   }
 
+  // Compute profile completion for progress bar
+  const personalComplete = !!(
+    user.full_name &&
+    user.phone &&
+    user.date_of_birth &&
+    user.gender
+  );
+  const locationComplete = !!(user.city && user.state && user.country);
+  const educationComplete = !!user.highest_qualification;
+  const experienceComplete =
+    user.experience_years === 0 ||
+    user.experience_years === "0" ||
+    (user.experience_years !== undefined &&
+      user.experience_years !== null &&
+      user.experience_years !== "" &&
+      Number(user.experience_years) >= 0);
+  const jobPreferencesComplete = !!(user.job_type && user.availability);
+
+  const completionSections = [
+    personalComplete,
+    locationComplete,
+    educationComplete,
+    experienceComplete,
+    jobPreferencesComplete,
+  ];
+  const completedCount = completionSections.filter(Boolean).length;
+  const completionPercent = Math.round(
+    (completedCount / completionSections.length) * 100,
+  );
+
   return (
     <div className="space-y-6">
       {/* User Header Card */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold text-lg">
-              {user.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+        <div className="p-6 sm:p-7">
+          <div className="flex items-start gap-4 sm:gap-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold text-xl sm:text-2xl ring-4 ring-primary-100">
+              {user.full_name
+                ? user.full_name.trim().charAt(0).toUpperCase()
+                : "U"}
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 {user.full_name}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm text-gray-600 mt-1">
                 {user.highest_qualification || "Add education"}
               </p>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                <span>{user.experience_years ?? 0} years experience</span>
-                <span>•</span>
-                <span>{user.phone || "No phone"}</span>
+              <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-500 mt-3">
+                <div className="inline-flex items-center gap-1.5">
+                  <Briefcase size={14} className="text-gray-400" />
+                  <span>
+                    {user.experience_years !== undefined &&
+                    user.experience_years !== null
+                      ? `${user.experience_years} year${
+                          Number(user.experience_years) === 1 ? "" : "s"
+                        } experience`
+                      : "Experience not added"}
+                  </span>
+                </div>
+                {(user.city || user.state || user.country) && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <MapPin size={14} className="text-gray-400" />
+                    <span className="truncate">
+                      {user.city || user.state || user.country
+                        ? [user.city, user.state, user.country]
+                            .filter(Boolean)
+                            .join(", ")
+                        : "Add location"}
+                    </span>
+                  </div>
+                )}
+                {user.phone && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <Phone size={14} className="text-gray-400" />
+                    <span>{user.phone}</span>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Profile Completion
+              </span>
+              <span className="text-xs font-semibold text-gray-800">
+                {completionPercent}% complete
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary-500 to-blue-500 transition-all duration-300"
+                style={{ width: `${completionPercent}%` }}
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <User size={20} />
               Personal Information
             </h3>
           </div>
-          <div className="p-4">
-            <div className="space-y-2">
+          <div className="p-6">
+            <div className="space-y-3">
               <InfoItem label="Full Name" value={user.full_name} />
               <InfoItem label="Mobile" value={user.phone} />
               <InfoItem
@@ -1582,15 +1659,15 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <MapPin size={20} />
               Location
             </h3>
           </div>
-          <div className="p-4">
-            <div className="space-y-2">
+          <div className="p-6">
+            <div className="space-y-3">
               <InfoItem label="City" value={user.city} />
               <InfoItem label="State" value={user.state} />
               <InfoItem label="Country" value={user.country} />
@@ -1598,15 +1675,15 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <GraduationCap size={20} />
               Education & Skills
             </h3>
           </div>
-          <div className="p-4">
-            <div className="space-y-2">
+          <div className="p-6">
+            <div className="space-y-3">
               <InfoItem
                 label="Qualification"
                 value={user.highest_qualification}
@@ -1627,15 +1704,15 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <Briefcase size={20} />
               Job Preferences
             </h3>
           </div>
-          <div className="p-4">
-            <div className="space-y-2">
+          <div className="p-6">
+            <div className="space-y-3">
               <InfoItem
                 label="Experience Years"
                 value={
@@ -1665,14 +1742,14 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
           user.github_url;
 
         return shouldShowLinkedIn || shouldShowGitHub ? (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
               <h3 className="text-sm font-semibold text-gray-800">
                 Professional Links
               </h3>
             </div>
             <div className="p-6">
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {shouldShowLinkedIn && (
                   <LinkItem label="LinkedIn" url={user.linkedin_url || ""} />
                 )}
@@ -1710,17 +1787,40 @@ function ProfileView({ user, onEdit }: ProfileViewProps) {
           }
 
           return (
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <a
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary-600 hover:text-blue-700 font-medium"
-                >
-                  <FileText size={18} />
-                  View Resume
-                </a>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center">
+                    <FileText size={20} className="text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Resume
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      View or download your latest uploaded resume
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+                  >
+                    <FileText size={16} />
+                    View
+                  </a>
+                  <a
+                    href={resumeUrl}
+                    download
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <FileText size={16} />
+                    Download
+                  </a>
+                </div>
               </div>
             </div>
           );
@@ -1737,9 +1837,11 @@ interface InfoItemProps {
 
 function InfoItem({ label, value }: InfoItemProps) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-600">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value || "—"}</span>
+    <div className="flex justify-between items-center gap-4 py-2 border-b border-gray-100 last:border-0">
+      <span className="text-xs sm:text-sm text-gray-600">{label}</span>
+      <span className="text-xs sm:text-sm font-medium text-gray-900 text-right break-words">
+        {value || "—"}
+      </span>
     </div>
   );
 }
@@ -1753,16 +1855,25 @@ interface LinkItemProps {
 function LinkItem({ label, url }: LinkItemProps) {
   if (!url) return null;
 
+   let displayLabel = label;
+   try {
+     const parsed = new URL(url);
+     const hostname = parsed.hostname.replace(/^www\./, "");
+     displayLabel = `${label} · ${hostname}`;
+   } catch {
+     // Fallback to label only if URL parsing fails
+   }
+
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-      <span className="text-sm text-gray-600">{label}</span>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-gray-100 last:border-0">
+      <span className="text-xs sm:text-sm text-gray-600">{label}</span>
       <a
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="text-sm text-primary-600 hover:text-blue-700 font-medium truncate max-w-xs"
+        className="text-xs sm:text-sm font-semibold text-primary-600 hover:text-primary-700 hover:underline break-all"
       >
-        {url}
+        {displayLabel}
       </a>
     </div>
   );

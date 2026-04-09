@@ -85,11 +85,21 @@ export default function Saved() {
     try {
       const response = await api.delete<ApiResponse>(`/jobs/save/${jobId}`);
 
-      if (response.data.success) {
+      // Some backends return 204 No Content or omit the success flag even when the
+      // deletion succeeds, so treat any 2xx response as a success by default.
+      const isSuccessfulStatus =
+        response.status >= 200 && response.status < 300;
+      const isSuccessfulFlag = (response.data as ApiResponse | undefined)
+        ?.success;
+
+      if (isSuccessfulStatus || isSuccessfulFlag) {
         setSavedJobs((prev) => prev.filter((job) => job.job_id !== jobId));
         showSuccess("Job removed from saved list");
       } else {
-        showError(response.data.message || "Failed to remove job");
+        const message =
+          (response.data as ApiResponse | undefined)?.message ||
+          "Failed to remove job";
+        showError(message);
       }
     } catch (err: unknown) {
       console.error("Error removing job:", err);
@@ -203,16 +213,11 @@ export default function Saved() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => router.push("/jobs")}
-                  className="btn btn-primary px-6 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-6 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Browse Jobs
                 </button>
-                <button
-                  onClick={() => router.push("/dashboard")}
-                  className="btn btn-ghost px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Back to Dashboard
-                </button>
+                
               </div>
             </div>
           </div>

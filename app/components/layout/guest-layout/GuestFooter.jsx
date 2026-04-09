@@ -106,8 +106,8 @@ function GuestFooter(){
                 <button
                   type="submit"
                   className="absolute right-1 top-1/2 -translate-y-1/2 
-      px-4 py-2 text-sm font-semibold bg-[#BB1919] 
-      hover:bg-[#AD1717] active:bg-[#971414] text-white 
+      px-4 py-2 text-sm font-semibold bg-white text-gray-700 
+      border border-gray-200 hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 
       transition-colors rounded-xl"
                 >
                   Subscribe

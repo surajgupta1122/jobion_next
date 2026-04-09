@@ -3,10 +3,10 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import db from "@/app/lib/db";
 
 export async function GET() {
   try {
-    // ✅ FIXED
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -14,7 +14,7 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
-    let decoded;
+    let decoded: any;
 
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET!);
@@ -22,10 +22,19 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
-    return NextResponse.json({
-      user: decoded,
-    });
+    const userId = decoded?.id;
+    if (!userId) return NextResponse.json({ user: null });
 
+    const [rows]: any = await db.query(
+      "SELECT id, email, role, name, created_at, last_login FROM users WHERE id = ? LIMIT 1",
+      [userId],
+    );
+
+    const user = rows?.[0] ?? null;
+
+    return NextResponse.json({
+      user,
+    });
   } catch (error) {
     console.error("Session error:", error);
     return NextResponse.json({ user: null });

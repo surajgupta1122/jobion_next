@@ -188,18 +188,23 @@ export default function Hero(): JSX.Element {
   };
 
   return (
-    <section className="min-h-[80vh] w-full flex items-center justify-center bg-white px-4 pt-16 pb-20">
-      <div className="max-w-6xl w-full text-center">
+    <section className="w-full bg-white px-4 py-24 flex items-center justify-center">
+      <div className="max-w-4xl w-full text-center space-y-4">
 
         {/* Heading */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.3rem] font-extrabold text-gray-900 leading-tight mb-6">
-          Trusted Opportunities for{" "}
-          <span className="text-[#BB1919] ">Fresh Talent</span>
+        <h1 className="text-4xl sm:text-5xl md:text-[3.3rem] font-extrabold text-gray-900 leading-tight tracking-tight">
+          Trusted opportunities for{" "}
+          <span className="text-[#BB1919]">fresh talent</span>
         </h1>
+
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          Find fresher, internship, and entry-level jobs from trusted companies.
+        </p>
 
         {/* Active Filters Display */}
         {activeFilters.length > 0 && (
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <span className="text-sm text-gray-600">Active filters:</span>
             {activeFilters.map((filter, index) => (
               <div
@@ -226,10 +231,10 @@ export default function Hero(): JSX.Element {
         )}
 
         {/* Search Box */}
-        <div className="bg-[#F7F7FB] border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-md max-w-5xl mx-auto">
+        <div className="bg-[#F7F7FB] border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-md max-w-4xl mx-auto mt-6">
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
           >
 
             {/* Job title with suggestions */}
@@ -238,7 +243,7 @@ export default function Hero(): JSX.Element {
                 Job title or skill
               </label>
 
-              <div className="relative flex items-center gap-2.5 bg-white rounded-xl px-3.5 py-2.5 sm:py-3 border border-gray-200 focus-within:ring focus-within:ring-[#BB1919] transition-all shadow-sm">
+              <div className="relative flex items-center gap-2.5 bg-white rounded-xl px-3.5 py-3.5 border border-gray-200 focus-within:ring focus-within:ring-[#BB1919] focus-within:ring-offset-0 transition-all shadow-sm">
                 <Search size={18} className="text-[#BB1919]" />
 
                 <input
@@ -249,7 +254,7 @@ export default function Hero(): JSX.Element {
                     setSearchTerm(e.target.value)
                   }
                   onFocus={() => setShowJobSuggestions(true)}
-                  className="w-full bg-transparent outline-none text-sm sm:text-base border-none placeholder-[#7D7280]/90 font-semibold"
+                  className="w-full bg-transparent outline-none text-sm sm:text-base border-none placeholder-[#7D7280]/90 font-medium"
                 />
               </div>
 
@@ -277,7 +282,7 @@ export default function Hero(): JSX.Element {
                 City / area
               </label>
 
-              <div className="relative flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 sm:py-3 focus-within:ring focus-within:ring-[#BB1919] transition-all shadow-sm">
+              <div className="relative flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-3.5 focus-within:ring focus-within:ring-[#BB1919] focus-within:ring-offset-0 transition-all shadow-sm">
                 <MapPin size={18} className="text-[#BB1919]" />
 
                 <input
@@ -288,7 +293,7 @@ export default function Hero(): JSX.Element {
                     setLocation(e.target.value)
                   }
                   onFocus={() => setShowLocationSuggestions(true)}
-                  className="w-full bg-transparent outline-none text-sm sm:text-base border-none placeholder-[#7D7280]/90 font-semibold"
+                  className="w-full bg-transparent outline-none text-sm sm:text-base border-none placeholder-[#7D7280]/90 font-medium"
                 />
               </div>
 
@@ -316,25 +321,28 @@ export default function Hero(): JSX.Element {
                 Experience
               </label>
 
-              <select
+              <div className="relative flex items-center bg-white rounded-xl border border-gray-200 px-3.5 py-3.5 shadow-sm focus-within:ring focus-within:ring-[#BB1919] focus-within:ring-offset-0 transition-all">
+                <Briefcase size={18} className="text-[#BB1919] mr-2" />
+                <select
                 value={experience}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setExperience(e.target.value)
                 }         
-                className="w-full rounded-xl px-3.5 py-2.5 sm:py-3 bg-white border border-gray-200 text-sm sm:text-base outline-none focus-within:ring focus-within:ring-[#BB1919] focus:ring-[#BB1919]500/20 transition-all cursor-pointer shadow-sm"
+                className="w-full bg-transparent text-sm sm:text-base outline-none border-none cursor-pointer text-gray-700"
               >
                 <option value="">Any</option>
                 <option value="fresher">Fresher / Entry</option>
                 <option value="mid">0–2 years</option>
                 <option value="senior">2+ years</option>
               </select>
+              </div>
             </div>
 
             {/* Button */}
-            <div className="sm:col-span-2 lg:col-span-3 flex justify-center mt-2">
+            <div className="md:col-span-3 flex justify-center mt-2">
               <button
                 type="submit"
-                className="bg-[#AD1717] text-white text-xl px-11 py-3 rounded-xl font-semibold hover:scale-105 duration-250 transition"
+                className="inline-flex items-center justify-center bg-[#AD1717] text-white text-base sm:text-lg px-10 sm:px-12 py-3.5 rounded-lg font-semibold shadow-md hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
               >
                 Search Jobs
               </button>

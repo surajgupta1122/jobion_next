@@ -639,61 +639,23 @@ export default function JobDetail() {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">
                       {jobTitle}
                     </h1>
-                    {job.company && (
-                      <p className="font-medium text-gray-400 mt-1">{job.company}</p>
-                    )}
                   </div>
                 </div>
 
-                {/* Quick Info Row */}
-                <div className="flex flex-wrap gap-2">
-                  {job.type && (
-                    <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <Briefcase size={14} /> {job.type}
-                    </span>
-                  )}
-                  {job.workMode && (
-                    <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <Clock size={14} /> {job.workMode}
-                    </span>
-                  )}
-                  {jobLocation && (
-                    <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <MapPin size={14} /> {jobLocation}
-                    </span>
-                  )}
-                  {experience && (
-                    <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <GraduationCap size={14} /> {experience}
-                    </span>
-                  )}
-                  {job.vacancies && job.vacancies > 0 && (
-                    <span className="border border-gray-300 rounded-xl px-2 py-0.5 bg-gray-100 inline-flex items-center text-gray-800 text-sm gap-1">
-                      <Users size={14} /> {job.vacancies}{" "}
-                      {job.vacancies === 1 ? "Vacancy" : "Vacancies"}
-                    </span>
-                  )}
-                </div>
-
+ 
                 {/* Details Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-3 border-t border-gray-200">
                   {/* Company */}
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      COMPANY
-                    </label>
-                    <p className="text-sm font-semibold text-gray-700 mt-1">
-                      {job.company}
-                    </p>
+                    <label className="text-xs text-gray-500">Company</label>
+                    <p className="text-sm font-medium text-gray-800">{job.company}</p>
                   </div>
 
                   {/* Work Mode */}
                   {job.workMode && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        WORK MODE
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
+                      <label className="text-xs text-gray-500">Work Mode</label>
+                      <p className="text-sm font-medium text-gray-800">
                         {job.workMode}
                       </p>
                     </div>
@@ -702,10 +664,8 @@ export default function JobDetail() {
                   {/* Experience */}
                   {experience && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        EXPERIENCE
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
+                      <label className="text-xs text-gray-500">Experience</label>
+                      <p className="text-sm font-medium text-gray-800">
                         {experience}
                       </p>
                     </div>
@@ -714,10 +674,8 @@ export default function JobDetail() {
                   {/* Vacancies */}
                   {job.vacancies && job.vacancies > 0 && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        VACANCIES
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
+                      <label className="text-xs text-gray-500">Vacancies</label>
+                      <p className="text-sm font-medium text-gray-800">
                         {job.vacancies}
                       </p>
                     </div>
@@ -726,22 +684,16 @@ export default function JobDetail() {
                   {/* Job Type */}
                   {job.type && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        JOB TYPE
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
-                        {job.type}
-                      </p>
+                      <label className="text-xs text-gray-500">Job Type</label>
+                      <p className="text-sm font-medium text-gray-800">{job.type}</p>
                     </div>
                   )}
 
                   {/* Location */}
                   {jobLocation && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        LOCATION
-                      </label>
-                      <p className="text-sm font-medium text-gray-700 mt-1">
+                      <label className="text-xs text-gray-500">Location</label>
+                      <p className="text-sm font-medium text-gray-800 break-words">
                         {jobLocation}
                       </p>
                     </div>
@@ -749,11 +701,9 @@ export default function JobDetail() {
 
                   {/* Salary */}
                   {salary && (
-                    <div className="sm:col-span-2">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        SALARY
-                      </label>
-                      <p className="text-sm font-semibold text-gray-700 mt-1">
+                    <div>
+                      <label className="text-xs text-gray-500">Salary</label>
+                      <p className="text-sm font-medium text-gray-800 break-words">
                         {salary}
                       </p>
                     </div>
@@ -982,16 +932,16 @@ export default function JobDetail() {
 
                 {!shouldHideActionButtons() && isAuthenticated && isApplied && (
                   <div className="space-y-4">
-                    <div className="bg-success-light border border-success-300 rounded-lg p-4 text-center">
-                      <div className="flex items-center justify-center gap-2 text-success-700 font-semibold">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-emerald-700 font-semibold">
                         <CheckCircle2 size={20} />
                         Applied ✓
                       </div>
-                      <p className="text-success-600 text-sm mt-2">
+                      <p className="text-emerald-700/80 text-sm mt-2">
                         You have successfully applied to this job
                       </p>
                     </div>
-                    <p className="text-xs text-text-muted text-center">
+                    <p className="text-xs text-gray-500 text-center">
                       Contact details are now unlocked for you
                     </p>
                   </div>
@@ -1017,7 +967,9 @@ export default function JobDetail() {
                       {candidateProfile.resume_path && (
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <label className="label text-sm">Resume</label>
+                            <label className="text-sm font-medium text-gray-700">
+                              Resume
+                            </label>
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
@@ -1114,14 +1066,14 @@ export default function JobDetail() {
                       )}
 
                       <div>
-                        <label className="label text-sm">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Cover letter (optional)
                         </label>
                         <textarea
                           rows={4}
                           value={coverLetter}
                           onChange={(e) => setCoverLetter(e.target.value)}
-                          className="textarea"
+                          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm outline-none focus:border-[#B51818] focus:ring-2 focus:ring-[#B51818]/20"
                           placeholder="Tell us why you're a good fit for this role..."
                         />
                       </div>
@@ -1130,7 +1082,7 @@ export default function JobDetail() {
                         <>
                           <div className="space-y-3">
                             <button
-                              className="btn btn-primary btn-md w-full"
+                              className="w-full rounded-xl bg-[#B51818] hover:bg-[#9A1414] px-4 py-2.5 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                               onClick={submitApplication}
                               disabled={applying || applied || profileLoading}
                             >
@@ -1153,7 +1105,7 @@ export default function JobDetail() {
                   !profileLoading && (
                     <div className="space-y-4">
                       <button
-                        className="btn btn-primary btn-md w-full"
+                        className="w-full rounded-xl bg-[#B51818] hover:bg-[#9A1414] px-4 py-2.5 text-sm font-semibold text-white transition-colors"
                         onClick={() => {
                           try {
                             const currentPath =
